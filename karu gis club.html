@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Karu GIS Club App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style id="app-style">
+    :root {
+      --green: #3A8B2D;
+      --orange: #F28C00;
+      --yellow: #E8D304;
+      --dark: #121212;
+      --light: #F5F5F5;
+      --gray: #A0A0A0;
+      --card-light: rgba(255, 255, 255, 0.9);
+      --card-dark: rgba(30, 30, 30, 0.9);
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .dark {
+      background-color: var(--dark);
+      color: var(--light);
+    }
+    
+    .light {
+      background-color: var(--light);
+      color: var(--dark);
+    }
+    
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--green), var(--orange));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s;
+    }
+    
+    .logo-container {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background-color:#F5F5F5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      }
+    }
+    
+    .logo {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+      animation: fadeIn 1s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .tagline {
+      color: white;
+      font-size: 1rem;
+      text-align: center;
+      max-width: 80%;
+      font-weight: 500;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .app-container {
+      display: none;
+      height: 100vh;
+      overflow-y: auto;
+      padding-bottom: 70px;
+    }
+    
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--card-light);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem 0;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+    
+    .dark .tab-bar {
+      background-color: var(--card-dark);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.7rem;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    
+    .tab.active {
+      opacity: 1;
+      color: var(--green);
+    }
+    
+    .tab i {
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+    }
+    
+    .screen {
+      display: none;
+      padding: 1rem;
+      min-height: calc(100vh - 70px);
+    }
+    
+    .screen.active {
+      display: block;
+    }
+    
+    .auth-container {
+      display: none;
+      height: 100vh;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .auth-logo {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 2rem;
+    }
+    
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      background-color: var(--card-light);
+      transition: background-color 0.3s;
+    }
+    
+    .dark .auth-card {
+      background-color: var(--card-dark);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--gray);
+      background-color: transparent;
+      transition: border-color 0.3s;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--green);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background-color: var(--green);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #2d6f24;
+    }
+    
+    .card {
+      background-color: var(--card-light);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+    
+    .dark .card {
+      background-color: var(--card-dark);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dark .card:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      background-color: var(--light);
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .header {
+      background-color: var(--dark);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .dashboard-item {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-radius: 16px;
+      padding: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .dashboard-item i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tech-item {
+      background: linear-gradient(135deg, var(--green), #56b349);
+      color: white;
+    }
+    
+    .media-item {
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      color: white;
+    }
+    
+    .leader-card {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      background-color: var(--card-light);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .leader-card {
+      background-color: var(--card-dark);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .leader-image {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 1rem;
+    }
+    
+    .leader-info {
+      flex: 1;
+    }
+    
+    .leader-name {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    
+    .leader-role {
+      color: var(--green);
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .leader-contact {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+    
+    .social-icons a {
+      color: var(--gray);
+      font-size: 1.2rem;
+      margin-right: 0.5rem;
+      transition: color 0.3s;
+    }
+    
+    .social-icons a:hover {
+      color: var(--green);
+    }
+    
+    .department-tabs {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    
+    .tab-button {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+    
+    .tab-button.active {
+      border-bottom: 2px solid var(--green);
+      font-weight: 600;
+    }
+    
+    .department-content {
+      display: none;
+    }
+    
+    .department-content.active {
+      display: block;
+    }
+    
+    .course-item {
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      background-color: var(--card-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .dark .course-item {
+      background-color: var(--card-dark);
+    }
+    
+    .course-item.technical {
+      border-left: 4px solid var(--green);
+    }
+    
+    .course-item.media {
+      border-left: 4px solid var(--orange);
+    }
+    
+    .tutorial-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .tutorial-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .tutorial-card {
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .tutorial-image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    
+    .tutorial-info {
+      padding: 0.75rem;
+      background-color: var(--card-light);
+    }
+    
+    .dark .tutorial-info {
+      background-color: var(--card-dark);
+    }
+    
+    .tutorial-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .tutorial-category {
+      font-size: 0.7rem;
+      color: var(--gray);
+    }
+    
+    .calendar {
+      background-color: var(--card-light);
+      border-radius: 16px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .dark .calendar {
+      background-color: var(--card-dark);
+    }
+    
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .calendar-month {
+      font-weight: 600;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+    }
+    
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.8rem;
+    }
+    
+    .calendar-day.current {
+      background-color: var(--green);
+      color: white;
+    }
+    
+    .calendar-day.has-event {
+      border: 2px solid var(--orange);
+      color: var(--orange);
+      font-weight: 600;
+    }
+    
+    .event-list {
+      margin-top: 1rem;
+    }
+    
+    .event-item {
+      padding: 0.75rem;
+      background-color: var(--light);
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--green);
+    }
+    
+    .dark .event-item {
+      background-color: var(--dark);
+      border-left: 4px solid var(--green);
+    }
+    
+    .event-date {
+      font-size: 0.7rem;
+      color: var(--gray);
+    }
+    
+    .event-title {
+      font-weight: 600;
+    }
+    
+    .chat-container {
+      height: calc(100vh - 180px);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    
+    .message {
+      margin-bottom: 1rem;
+      max-width: 80%;
+    }
+    
+    .message-sent {
+      margin-left: auto;
+      background-color: var(--green);
+      color: white;
+      border-radius: 16px 16px 4px 16px;
+      padding: 0.75rem;
+    }
+    
+    .message-received {
+      margin-right: auto;
+      background-color: var(--card-light);
+      border-radius: 16px 16px 16px 4px;
+      padding: 0.75rem;
+    }
+    
+    .dark .message-received {
+      background-color: var(--card-dark);
+    }
+    
+    .message-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+    
+    .message-sender {
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-right: 0.5rem;
+    }
+    
+    .message-time {
+      font-size: 0.7rem;
+      color: var(--gray);
+    }
+    
+    .chat-input {
+      display: flex;
+      padding: 1rem;
+      background-color: var(--card-light);
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .chat-input {
+      background-color: var(--card-dark);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .chat-input input {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 24px;
+      border: none;
+      background-color: var(--light);
+      margin-right: 0.5rem;
+    }
+    
+    .dark .chat-input input {
+      background-color: var(--dark);
+      color: var(--light);
+    }
+    
+    .chat-input button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background-color: var(--green);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .feedback-form {
+      padding: 1rem;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--gray);
+      background-color: transparent;
+      margin-bottom: 1rem;
+    }
+    
+    .form-textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--gray);
+      background-color: transparent;
+      min-height: 150px;
+      margin-bottom: 1rem;
+      resize: vertical;
+    }
+    
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding: 1rem;
+    }
+    
+    .social-card {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--card-light);
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s;
+    }
+    
+    .dark .social-card {
+      background-color: var(--card-dark);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .social-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .dark .social-card:hover {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+    
+    .social-card i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .social-card.linkedin i {
+      color: #079c18;
+    }
+    
+    .social-card.instagram i {
+      color: #079c18;
+    }
+    
+    .social-card.tiktok i {
+      color: #079c18;
+    }
+    
+    .social-card.twitter i {
+      color: #079c18;
+    }
+    
+    .social-card.facebook i {
+      color: #079c18;
+    }
+    
+    .social-card.youtube i {
+      color: #079c18;
+    }
+    
+    .social-card.github i {
+      color: #079c18;
+    }
+    
+    .social-card.email i {
+      color: #079c18;
+    }
+    
+    .social-name {
+      font-size: 0.8rem;
+    }
+    
+    .toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--card-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+    }
+    
+    .dark .toggle-theme {
+      background-color: var(--card-dark);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body class="light">
+  <!-- Splash Screen Logo Update -->
+  <div class="splash-screen">
+    <div class="logo-container">
+      <!-- Replace the existing logo URL with the primary GIS Club logo -->
+      <img id="splashLogo" src="karu gis logo.jpg" alt="gis logo" class="logo">
+    </div>
+    <p class="tagline">Rediscovering Geography, Highlighting Geo-standards</p>
+  </div>
+  
+  <!-- Authentication Screen Logo Update -->
+  <div class="auth-container" id="authContainer">
+    <!-- Replace the auth logo with the primary GIS Club logo -->
+    <img id="authLogo" src="karu gis logo.jpg" alt="GIS Club Logo" class="auth-logo">
+    <div class="auth-card">
+      <h2 class="text-xl font-bold mb-6 text-center">Login to Karu GIS Club</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <input type="email" id="email" class="form-control" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="password" class="form-control" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Header Logo Addition (Optional) -->
+  <div class="header">
+    <!-- Add the primary logo next to the title -->
+    <div class="flex items-center">
+      <img id="headerLogo" src="karu gis logo.jpg" alt="GIS Club Logo" class="w-8 h-8 mr-2">
+      <h1 class="text-lg font-bold">Karu GIS Club</h1>
+    </div>
+    <!-- ... rest of code ... -->
+  </div>
+  
+  <!-- Main App Container -->
+  <div class="app-container" id="appContainer">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="text-lg font-bold">Karu GIS Club</h1>
+      <div class="flex items-center">
+        <span class="mr-2 text-sm" id="userWelcome">Welcome, User</span>
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="User Avatar" class="avatar">
+      </div>
+    </div>
+    
+    <!-- Dashboard Screen -->
+    <div class="screen active" id="dashboardScreen">
+      <h2 class="text-xl font-bold mb-4">Dashboard</h2>
+      <div class="dashboard-grid">
+        <div class="dashboard-item tech-item" data-target="tutorialsScreen">
+          <i class="fas fa-book"></i>
+          <span>Tutorials</span>
+        </div>
+        <div class="dashboard-item media-item" data-target="eventsScreen">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Events</span>
+        </div>
+        <div class="dashboard-item tech-item" data-target="leadershipScreen">
+          <i class="fas fa-users"></i>
+          <span>Leadership</span>
+        </div>
+        <div class="dashboard-item media-item" data-target="departmentsScreen">
+          <i class="fas fa-laptop-code"></i>
+          <span>Departments</span>
+        </div>
+        <div class="dashboard-item tech-item" data-target="forumScreen">
+          <i class="fas fa-comments"></i>
+          <span>Forum</span>
+        </div>
+        <div class="dashboard-item media-item" data-target="feedbackScreen">
+          <i class="fas fa-comment-dots"></i>
+          <span>Feedback</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- About Screen -->
+    <div class="screen" id="aboutScreen">
+      <h2 class="text-xl font-bold mb-4">About Karu GIS Club</h2>
+      <div class="card">
+        <div class="flex justify-center mb-4">
+          <!-- Admin logo upload control for primary logo -->
+          <div class="admin-controls" style="display: none;">
+            <label for="primaryLogoUpload" class="btn btn-primary mb-2 text-center text-sm">Change Primary Logo</label>
+            <input id="primaryLogoUpload" type="file" accept="image/*" style="display:none;" />
+          </div>
+          <img id="primaryLogo" src="karu gis logo.jpg" alt="GIS Club Logo" class="w-24 h-24">
+        </div>
+        <p class="mb-4 text-center">
+          "Karu GIS Club is a student-led initiative exploring geospatial tech through creativity, innovation, and skill development."
+        </p>
+        <h3 class="text-lg font-semibold mb-2">Motto</h3>
+        <p class="mb-3">Rediscovering Geography, Highlighting Geo-standards</p>
+        
+        <h3 class="text-lg font-semibold mb-2">Mission</h3>
+        <p class="mb-3">Promote understanding and use of geospatial tech through education, research, and outreach</p>
+        
+        <h3 class="text-lg font-semibold mb-2">Vision</h3>
+        <p class="mb-3">Build a vibrant GIS community of students and professionals</p>
+        
+        <h3 class="text-lg font-semibold mb-2">University Website</h3>
+        <a href="https://karu.ac.ke" target="_blank" class="text-green-600">https://karu.ac.ke</a>
+      </div>
+      
+      <h3 class="text-lg font-semibold mb-2">Department Logos</h3>
+      <div class="flex justify-between mb-4">
+        <div class="text-center">
+          <!-- Admin logo upload control for media dept logo -->
+          <div class="admin-controls" style="display: none;">
+            <label for="mediaLogoUpload" class="btn btn-primary mb-2 text-center text-xs">Change Logo</label>
+            <input id="mediaLogoUpload" type="file" accept="image/*" style="display:none;" />
+          </div>
+          <img id="mediaDeptLogo" src="media logo.jpeg" alt="Media Department Logo" class="w-20 h-20 mx-auto mb-2">
+          <span class="text-sm">Media Dept</span>
+        </div>
+        <div class="text-center">
+          <!-- Admin logo upload control for tech dept logo -->
+          <div class="admin-controls" style="display: none;">
+            <label for="techLogoUpload" class="btn btn-primary mb-2 text-center text-xs">Change Logo</label>
+            <input id="techLogoUpload" type="file" accept="image/*" style="display:none;" />
+          </div>
+          <img id="techDeptLogo" src="technical logo.jpeg" alt="Technical Department Logo" class="w-20 h-20 mx-auto mb-2">
+          <span class="text-sm">Technical Dept.</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Leadership Screen -->
+    <div class="screen" id="leadershipScreen">
+      <h2 class="text-xl font-bold mb-4">Leadership</h2>
+      
+      <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png" alt="Patron" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Dr. Tom Auna</div>
+          <div class="leader-role">Patron</div>
+          <div class="leader-contact">touna@karu.ac.ke</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-linkedin"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-twitter"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637425_960_720.png" alt="Chairperson" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Dennis Wambua</div>
+          <div class="leader-role">Chairperson</div>
+          <div class="leader-contact">+254711891643</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-linkedin"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-instagram"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637424_960_720.png" alt="Vice Chairperson" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Wilson Kilungya</div>
+          <div class="leader-role">Vice Chairperson</div>
+          <div class="leader-contact">+254 706783613</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-github"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-twitter"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png" alt="Secretary" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Naomy Maritim</div>
+          <div class="leader-role">Secretary</div>
+          <div class="leader-contact">+254 742071153</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-linkedin"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-github"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+
+       <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png" alt="Secretary" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Brenda Muthui</div>
+          <div class="leader-role">ViceSecretary</div>
+          <div class="leader-contact">+254716854208</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-linkedin"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-github"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/12/41/avatar-3637425_960_720.png" alt="Treasurer" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">George Gitau</div>
+          <div class="leader-role">Treasurer</div>
+          <div class="leader-contact">+254 115240057</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-instagram"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-twitter"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+    
+
+     <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png" alt="Secretary" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Soniah Mburu</div>
+          <div class="leader-role">Organizing Secretary</div>
+          <div class="leader-contact">+254 759688486</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-linkedin"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-github"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+
+       <div class="leader-card">
+        <img src="https://cdn.pixabay.com/photo/2018/08/28/13/29/avatar-3637561_960_720.png" alt="Secretary" class="leader-image">
+        <div class="leader-info">
+          <div class="leader-name">Jacob Mulongo</div>
+          <div class="leader-role">Club Editor</div>
+          <div class="leader-contact">+254 797599145</div>
+          <div class="social-icons">
+            <a href="javascript:void(0)"><i class="fab fa-linkedin"></i></a>
+            <a href="javascript:void(0)"><i class="fab fa-github"></i></a>
+            <a href="javascript:void(0)"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Departments Screen -->
+    <div class="screen" id="departmentsScreen">
+      <h2 class="text-xl font-bold mb-4">Departments</h2>
+      
+      <div class="department-tabs">
+        <div class="tab-button active" data-dept="technical">Technical</div>
+        <div class="tab-button" data-dept="media">Media</div>
+      </div>
+      
+      <div class="department-content active" id="technicalDept">
+        <h3 class="text-lg font-semibold mb-2">Technical Department</h3>
+        <p class="mb-4">Focusing on programming, development, and spatial data science skills.</p>
+        
+        <h4 class="text-md font-semibold mb-2">Courses</h4>
+        <div class="course-item technical">
+          <span>Programming</span>
+          <i class="fas fa-code"></i>
+        </div>
+        <div class="course-item technical">
+          <span>Web Development</span>
+          <i class="fas fa-globe"></i>
+        </div>
+        <div class="course-item technical">
+          <span>Spatial Data Science</span>
+          <i class="fas fa-map-marked-alt"></i>
+        </div>
+        <div class="course-item technical">
+          <span>Software Testing</span>
+          <i class="fas fa-bug"></i>
+        </div>
+        <div class="course-item technical">
+          <span>PC Repair</span>
+          <i class="fas fa-laptop-medical"></i>
+        </div>
+        
+        <div class="mt-4 mb-2">
+          <a href="javascript:void(0)" class="flex items-center text-green-600">
+            <i class="fab fa-github mr-2"></i> Visit our GitHub
+          </a>
+        </div>
+      </div>
+      
+      <div class="department-content" id="mediaDept">
+        <h3 class="text-lg font-semibold mb-2">Media Department</h3>
+        <p class="mb-4">Focusing on design, video editing, and content creation.</p>
+        
+        <h4 class="text-md font-semibold mb-2">Courses</h4>
+        <div class="course-item media">
+          <span>Graphic Design</span>
+          <i class="fas fa-paint-brush"></i>
+        </div>
+        <div class="course-item media">
+          <span>Video Editing</span>
+          <i class="fas fa-film"></i>
+        </div>
+        <div class="course-item media">
+          <span>Content Creation</span>
+          <i class="fas fa-camera"></i>
+        </div>
+        <div class="course-item media">
+          <span>Social Media Management</span>
+          <i class="fas fa-hashtag"></i>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tutorials Screen -->
+    <div class="screen" id="tutorialsScreen">
+      <h2 class="text-xl font-bold mb-4">Tutorials & Resources</h2>
+      
+      <div class="tutorial-grid">
+        <div class="tutorial-card">
+          <img src="https://cdn.pixabay.com/photo/2018/05/18/15/30/webdesign-3411373_960_720.jpg" alt="Tutorial Thumbnail" class="tutorial-image">
+          <div class="tutorial-info">
+            <div class="tutorial-title">Introduction to QGIS</div>
+            <div class="tutorial-category">Technical • GIS</div>
+          </div>
+        </div>
+        
+        <div class="tutorial-card">
+          <img src="https://cdn.pixabay.com/photo/2017/08/10/08/47/laptop-2620118_960_720.jpg" alt="Tutorial Thumbnail" class="tutorial-image">
+          <div class="tutorial-info">
+            <div class="tutorial-title">Map Design Basics</div>
+            <div class="tutorial-category">Media • Design</div>
+          </div>
+        </div>
+        
+        <div class="tutorial-card">
+          <img src="https://cdn.pixabay.com/photo/2018/04/17/11/03/database-3327281_960_720.jpg" alt="Tutorial Thumbnail" class="tutorial-image">
+          <div class="tutorial-info">
+            <div class="tutorial-title">Spatial Databases</div>
+            <div class="tutorial-category">Technical • Database</div>
+          </div>
+        </div>
+        
+        <div class="tutorial-card">
+          <img src="https://cdn.pixabay.com/photo/2016/11/19/14/00/code-1839406_960_720.jpg" alt="Tutorial Thumbnail" class="tutorial-image">
+          <div class="tutorial-info">
+            <div class="tutorial-title">Python for GIS</div>
+            <div class="tutorial-category">Technical • Programming</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Events Screen -->
+    <div class="screen" id="eventsScreen">
+      <h2 class="text-xl font-bold mb-4">Event Manager</h2>
+      
+      <div class="calendar">
+        <div class="calendar-header">
+          <button class="calendar-nav"><i class="fas fa-chevron-left"></i></button>
+          <div class="calendar-month">May 2025</div>
+          <button class="calendar-nav"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <div class="grid grid-cols-7 gap-1 text-center text-xs mb-2">
+          <div>Sun</div>
+          <div>Mon</div>
+          <div>Tue</div>
+          <div>Wed</div>
+          <div>Thu</div>
+          <div>Fri</div>
+          <div>Sat</div>
+        </div>
+        
+        <div class="calendar-grid">
+          <div class="calendar-day">28</div>
+          <div class="calendar-day">29</div>
+          <div class="calendar-day">30</div>
+          <div class="calendar-day">1</div>
+          <div class="calendar-day">2</div>
+          <div class="calendar-day">3</div>
+          <div class="calendar-day">4</div>
+          <div class="calendar-day">5</div>
+          <div class="calendar-day">6</div>
+          <div class="calendar-day">7</div>
+          <div class="calendar-day">8</div>
+          <div class="calendar-day has-event">9</div>
+          <div class="calendar-day">10</div>
+          <div class="calendar-day">11</div>
+          <div class="calendar-day current">12</div>
+          <div class="calendar-day">13</div>
+          <div class="calendar-day">14</div>
+          <div class="calendar-day">15</div>
+          <div class="calendar-day has-event">16</div>
+          <div class="calendar-day">17</div>
+          <div class="calendar-day">18</div>
+          <div class="calendar-day">19</div>
+          <div class="calendar-day">20</div>
+          <div class="calendar-day">21</div>
+          <div class="calendar-day has-event">22</div>
+          <div class="calendar-day">23</div>
+          <div class="calendar-day">24</div>
+          <div class="calendar-day">25</div>
+          <div class="calendar-day">26</div>
+          <div class="calendar-day">27</div>
+          <div class="calendar-day">28</div>
+          <div class="calendar-day">29</div>
+          <div class="calendar-day">30</div>
+          <div class="calendar-day">31</div>
+          <div class="calendar-day">1</div>
+        </div>
+      </div>
+      
+      <h3 class="text-lg font-semibold mb-2">Upcoming Events</h3>
+      <div class="event-list">
+        <div class="event-item">
+          <div class="event-date">May 9, 2025 • 10:00 AM</div>
+          <div class="event-title">Introduction to GIS Workshop</div>
+        </div>
+        
+        <div class="event-item">
+          <div class="event-date">May 16, 2025 • 2:00 PM</div>
+          <div class="event-title">Mapathon: Mapping Local Community</div>
+        </div>
+        
+        <div class="event-item">
+          <div class="event-date">May 22, 2025 • 4:00 PM</div>
+          <div class="event-title">Guest Speaker: GIS in Agriculture</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Forum Screen -->
+    <div class="screen" id="forumScreen">
+      <h2 class="text-xl font-bold mb-4">Forum & Chat</h2>
+      
+      <div class="chat-container">
+        <div class="chat-messages">
+          <div class="message message-received">
+            <div class="message-info">
+              <span class="message-sender">John K.</span>
+              <span class="message-time">10:30 AM</span>
+            </div>
+            <div class="message-content">
+              Hey everyone! Just wanted to remind you about tomorrow's QGIS workshop.
+            </div>
+          </div>
+          
+          <div class="message message-sent">
+            <div class="message-info">
+              <span class="message-sender">You</span>
+              <span class="message-time">10:32 AM</span>
+            </div>
+            <div class="message-content">
+              Thanks for the reminder! What time does it start?
+            </div>
+          </div>
+          
+          <div class="message message-received">
+            <div class="message-info">
+              <span class="message-sender">Mary N.</span>
+              <span class="message-time">10:35 AM</span>
+            </div>
+            <div class="message-content">
+              It starts at 10:00 AM in Lab 3. Don't forget to bring your laptop!
+            </div>
+          </div>
+          
+          <div class="message message-received">
+            <div class="message-info">
+              <span class="message-sender">David M.</span>
+              <span class="message-time">10:40 AM</span>
+            </div>
+            <div class="message-content">
+              I'll be sharing some sample datasets to work with during the workshop. Check your emails later today.
+            </div>
+          </div>
+        </div>
+        
+        <div class="chat-input">
+          <input type="text" placeholder="Type your message...">
+          <button><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Feedback Screen -->
+    <div class="screen" id="feedbackScreen">
+      <h2 class="text-xl font-bold mb-4">Feedback & Complaints</h2>
+      
+      <div class="card">
+        <form class="feedback-form">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select">
+              <option>App</option>
+              <option>Club</option>
+              <option>Leadership</option>
+              <option>Training</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Your Feedback</label>
+            <textarea class="form-textarea" placeholder="Share your thoughts or concerns..."></textarea>
+          </div>
+          
+          <div class="form-group flex items-center mb-4">
+            <input type="checkbox" id="anonymous" class="mr-2">
+            <label for="anonymous">Submit Anonymously</label>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Social Screen -->
+    <div class="screen" id="socialScreen">
+      <h2 class="text-xl font-bold mb-4">Connect With Us</h2>
+      
+      <div class="social-grid">
+        <a href="https://linkedin.com/in/karu-gis-club" target="_blank" class="social-card linkedin">
+          <i class="fab fa-linkedin"></i>
+          <span class="social-name">LinkedIn</span>
+        </a>
+        
+        <a href="https://instagram.com/karugisclub" target="_blank" class="social-card instagram">
+          <i class="fab fa-instagram"></i>
+          <span class="social-name">Instagram</span>
+        </a>
+        
+        <a href="https://tiktok.com/@karugisclub" target="_blank" class="social-card tiktok">
+          <i class="fab fa-tiktok"></i>
+          <span class="social-name">TikTok</span>
+        </a>
+        
+        <a href="https://twitter.com/karugisclub" target="_blank" class="social-card twitter">
+          <i class="fab fa-twitter"></i>
+          <span class="social-name">X/Twitter</span>
+        </a>
+        
+        <a href="https://facebook.com/karugisclub" target="_blank" class="social-card facebook">
+          <i class="fab fa-facebook"></i>
+          <span class="social-name">Facebook</span>
+        </a>
+        
+        <a href="https://youtube.com/@karugisclub" target="_blank" class="social-card youtube">
+          <i class="fab fa-youtube"></i>
+          <span class="social-name">YouTube</span>
+        </a>
+        
+        <a href="https://github.com/karugisclub" target="_blank" class="social-card github">
+          <i class="fab fa-github"></i>
+          <span class="social-name">GitHub</span>
+        </a>
+        
+        <a href="mailto:karugisclub@gmail.com" class="social-card email">
+          <i class="fas fa-envelope"></i>
+          <span class="social-name">Email</span>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Bottom Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab active" data-screen="dashboardScreen">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </div>
+      <div class="tab" data-screen="aboutScreen">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+      </div>
+      <div class="tab" data-screen="leadershipScreen">
+        <i class="fas fa-users"></i>
+        <span>Leaders</span>
+      </div>
+      <div class="tab" data-screen="tutorialsScreen">
+        <i class="fas fa-book"></i>
+        <span>Tutorials</span>
+      </div>
+      <div class="tab" data-screen="socialScreen">
+        <i class="fas fa-share-alt"></i>
+        <span>Social</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Theme Toggle -->
+  <div class="toggle-theme" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </div>
+  
+  <div id="toastNotification" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg transform transition-transform duration-300 translate-y-[-100px]" style="z-index: 9999;">
+    <span id="toastMessage">Logo updated successfully</span>
+  </div>
+  
+  <script id="app-script">
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize logos from localStorage
+      loadLogosFromStorage();
+      
+      // Check if user is admin and show logo upload controls
+      checkAdminStatus();
+      
+      // Setup logo upload handlers
+      setupLogoUploadHandlers();
+      
+      // Simulate splash screen
+      setTimeout(() => {
+        document.querySelector('.splash-screen').style.opacity = '0';
+        setTimeout(() => {
+          document.querySelector('.splash-screen').style.display = 'none';
+          document.querySelector('#authContainer').style.display = 'flex';
+        }, 500);
+      }, 2500);
+      
+      // Login Form Handling
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        // Simple validation
+        if (email && password) {
+          // Hide auth container and show app
+          document.getElementById('authContainer').style.display = 'none';
+          document.getElementById('appContainer').style.display = 'block';
+          
+          // Set user name based on email
+          const userName = email.split('@')[0];
+          document.getElementById('userWelcome').textContent = `Welcome, ${userName}`;
+          
+          // Determine if admin based on email pattern (for demo purposes)
+          const isAdmin = email.includes('admin');
+          
+          // Store in localStorage
+          localStorage.setItem('karuGisUser', JSON.stringify({
+            email,
+            name: userName,
+            role: isAdmin ? 'Admin' : 'Member'
+          }));
+          
+          // Check admin status to display controls
+          checkAdminStatus();
+        }
+      });
+      
+      // Theme Toggle
+      document.getElementById('themeToggle').addEventListener('click', function() {
+        const body = document.body;
+        const icon = this.querySelector('i');
+        
+        if (body.classList.contains('light')) {
+          body.classList.remove('light');
+          body.classList.add('dark');
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+          localStorage.setItem('karuGisTheme', 'dark');
+        } else {
+          body.classList.remove('dark');
+          body.classList.add('light');
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+          localStorage.setItem('karuGisTheme', 'light');
+        }
+      });
+      
+      // Check saved theme
+      const savedTheme = localStorage.getItem('karuGisTheme');
+      if (savedTheme === 'dark') {
+        document.body.classList.remove('light');
+        document.body.classList.add('dark');
+        document.querySelector('#themeToggle i').classList.remove('fa-moon');
+        document.querySelector('#themeToggle i').classList.add('fa-sun');
+      }
+      
+      // Check if user is logged in
+      const user = JSON.parse(localStorage.getItem('karuGisUser'));
+      if (user) {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'block';
+        document.getElementById('userWelcome').textContent = `Welcome, ${user.name}`;
+      }
+      
+      // Tab Navigation
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remove active class from all tabs and screens
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+          
+          // Add active class to clicked tab
+          this.classList.add('active');
+          
+          // Show corresponding screen
+          const screenId = this.getAttribute('data-screen');
+          document.getElementById(screenId).classList.add('active');
+        });
+      });
+      
+      // Dashboard items navigation
+      document.querySelectorAll('.dashboard-item').forEach(item => {
+        item.addEventListener('click', function() {
+          const targetScreen = this.getAttribute('data-target');
+          
+          // Update tabs
+          document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.getAttribute('data-screen') === targetScreen) {
+              tab.classList.add('active');
+            }
+          });
+          
+          // Update screens
+          document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+          });
+          document.getElementById(targetScreen).classList.add('active');
+        });
+      });
+      
+      // Department Tabs
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+          const deptId = this.getAttribute('data-dept');
+          
+          // Update tab buttons
+          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update dept content
+          document.querySelectorAll('.department-content').forEach(dept => dept.classList.remove('active'));
+          if (deptId === 'technical') {
+            document.getElementById('technicalDept').classList.add('active');
+          } else {
+            document.getElementById('mediaDept').classList.add('active');
+          }
+        });
+      });
+      
+      // Chat Input
+      const chatInput = document.querySelector('.chat-input input');
+      const sendButton = document.querySelector('.chat-input button');
+      const chatMessages = document.querySelector('.chat-messages');
+      
+      sendButton.addEventListener('click', function() {
+        if (chatInput.value.trim() !== '') {
+          const message = createMessage(chatInput.value, 'You', true);
+          chatMessages.appendChild(message);
+          chatInput.value = '';
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      });
+      
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+          const message = createMessage(chatInput.value, 'You', true);
+          chatMessages.appendChild(message);
+          chatInput.value = '';
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+      });
+      
+      function createMessage(content, sender, isSent) {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12;
+        const timeString = `${formattedHours}:${minutes} ${ampm}`;
+        
+        const message = document.createElement('div');
+        message.className = isSent ? 'message message-sent' : 'message message-received';
+        
+        const messageInfo = document.createElement('div');
+        messageInfo.className = 'message-info';
+        
+        const messageSender = document.createElement('span');
+        messageSender.className = 'message-sender';
+        messageSender.textContent = sender;
+        
+        const messageTime = document.createElement('span');
+        messageTime.className = 'message-time';
+        messageTime.textContent = timeString;
+        
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        messageContent.textContent = content;
+        
+        messageInfo.appendChild(messageSender);
+        messageInfo.appendChild(messageTime);
+        message.appendChild(messageInfo);
+        message.appendChild(messageContent);
+        
+        return message;
+      }
+      
+      // Feedback form submission
+      document.querySelector('.feedback-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Thank you for your feedback! It has been submitted successfully.');
+        this.reset();
+      });
+      
+      // Calendar Day Click
+      document.querySelectorAll('.calendar-day').forEach(day => {
+        day.addEventListener('click', function() {
+          // For demonstration only - would typically show events for that day
+          if (this.classList.contains('has-event')) {
+            alert('You have events scheduled for this day.');
+          }
+        });
+      });
+      
+      // Tutorial cards click
+      document.querySelectorAll('.tutorial-card').forEach(card => {
+        card.addEventListener('click', function() {
+          alert('This is a prototype. In the full version, this would open the tutorial content.');
+        });
+      });
+      
+      // NEW FUNCTION: Load logos from localStorage
+      function loadLogosFromStorage() {
+        const defaultLogoUrl = "https://cdn.pixabay.com/photo/2016/11/28/12/11/gps-1865269_960_720.png";
+        
+        // Primary logo (used in multiple places)
+        const primaryLogo = localStorage.getItem('primaryLogo') || defaultLogoUrl;
+        document.getElementById('primaryLogo').src = primaryLogo;
+        document.getElementById('splashLogo').src = primaryLogo;
+        document.getElementById('authLogo').src = primaryLogo;
+        document.getElementById('headerLogo').src = primaryLogo;
+        
+        // Department logos
+        document.getElementById('mediaDeptLogo').src = localStorage.getItem('mediaDeptLogo') || defaultLogoUrl;
+        document.getElementById('techDeptLogo').src = localStorage.getItem('techDeptLogo') || defaultLogoUrl;
+      }
+      
+      // NEW FUNCTION: Check admin status and show/hide admin controls
+      function checkAdminStatus() {
+        const user = JSON.parse(localStorage.getItem('karuGisUser'));
+        if (user && user.role === 'Admin') {
+          document.querySelectorAll('.admin-controls').forEach(control => {
+            control.style.display = 'block';
+          });
+        }
+      }
+      
+      // NEW FUNCTION: Setup logo upload handlers
+      function setupLogoUploadHandlers() {
+        // Primary logo upload
+        document.getElementById('primaryLogoUpload').addEventListener('change', function(e) {
+          handleLogoUpload(e.target.files[0], 'primaryLogo', ['primaryLogo', 'splashLogo', 'authLogo', 'headerLogo']);
+        });
+        
+        // Media department logo upload
+        document.getElementById('mediaLogoUpload').addEventListener('change', function(e) {
+          handleLogoUpload(e.target.files[0], 'mediaDeptLogo', ['mediaDeptLogo']);
+        });
+        
+        // Technical department logo upload
+        document.getElementById('techLogoUpload').addEventListener('change', function(e) {
+          handleLogoUpload(e.target.files[0], 'techDeptLogo', ['techDeptLogo']);
+        });
+      }
+      
+      // NEW FUNCTION: Handle logo file upload
+      function handleLogoUpload(file, storageKey, elementIds) {
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          
+          // Save to localStorage
+          localStorage.setItem(storageKey, dataUrl);
+          
+          // Update all relevant elements on the page
+          elementIds.forEach(id => {
+            const elements = document.querySelectorAll(`#${id}`);
+            elements.forEach(element => {
+              element.src = dataUrl;
+            });
+          });
+          
+          // Show confirmation toast
+          showToast("Logo updated successfully");
+        };
+        
+        reader.readAsDataURL(file);
+      }
+      
+      // NEW FUNCTION: Show toast notification
+      function showToast(message) {
+        const toast = document.getElementById('toastNotification');
+        document.getElementById('toastMessage').textContent = message;
+        
+        // Show the toast
+        toast.style.transform = 'translateY(0)';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+          toast.style.transform = 'translateY(-100px)';
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
